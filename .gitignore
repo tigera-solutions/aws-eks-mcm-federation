@@ -1,0 +1,5 @@
+.DS_Store
+local-config.mk
+cluster-a-kubeconfig
+cluster-b-kubeconfig
+cluster-c-kubeconfig
