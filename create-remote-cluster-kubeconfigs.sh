@@ -1,9 +1,9 @@
 #! /usr/bin/env bash
 
 CLUSTERS="
-cluster-a
-cluster-b
-cluster-c"
+calico-cloud-us-east-1-eks
+calico-cloud-us-east-2-eks
+calico-cloud-us-west-2-eks"
 
 # Make sure kubectl is installed
 if ! [ -x "$(command -v kubectl)" ]; then

@@ -121,11 +121,11 @@ Resources:
       - VPC
       - IPv6CidrBlock
     Properties:
-      CidrBlock: !Select [ 0, !Cidr [ !GetAtt VPC.CidrBlock, 34, 8 ]]
+      CidrBlock: !Select [ 0, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
       Ipv6CidrBlock:
         Fn::Sub:
           - "${VpcPart}${SubnetPart}"
-          - SubnetPart: '01::/64'
+          - SubnetPart: '00::/64'
             VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
       VpcId:
         Ref: VPC
@@ -156,11 +156,11 @@ Resources:
       - VPC
       - IPv6CidrBlock
     Properties:
-      CidrBlock: !Select [ 1, !Cidr [ !GetAtt VPC.CidrBlock, 34, 8 ]]
+      CidrBlock: !Select [ 1, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
       Ipv6CidrBlock:
         Fn::Sub:
           - "${VpcPart}${SubnetPart}"
-          - SubnetPart: '02::/64'
+          - SubnetPart: '01::/64'
             VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
       VpcId:
         Ref: VPC
@@ -191,11 +191,11 @@ Resources:
       - VPC
       - IPv6CidrBlock
     Properties:
-      CidrBlock: !Select [ 2, !Cidr [ !GetAtt VPC.CidrBlock, 34, 8 ]]
+      CidrBlock: !Select [ 2, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
       Ipv6CidrBlock:
         Fn::Sub:
           - "${VpcPart}${SubnetPart}"
-          - SubnetPart: '03::/64'
+          - SubnetPart: '02::/64'
             VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
       VpcId:
         Ref: VPC
@@ -217,6 +217,111 @@ Resources:
     Properties:
       SubnetId:
         Ref: PublicSubnet2
+      RouteTableId:
+        Ref: PublicRt
+
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    DependsOn:
+      - VPC
+      - IPv6CidrBlock
+    Properties:
+      CidrBlock: !Select [ 3, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
+      Ipv6CidrBlock:
+        Fn::Sub:
+          - "${VpcPart}${SubnetPart}"
+          - SubnetPart: '03::/64'
+            VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub:
+              - ${AWS::StackName}-public-egress-${AZ}
+              - AZ: !Select
+                - 0
+                - Fn::GetAZs: ""
+        - Key: kubernetes.io/role/elb
+          Value: 1
+  PublicSubnet3RtAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet3
+      RouteTableId:
+        Ref: PublicRt
+
+  PublicSubnet4:
+    Type: AWS::EC2::Subnet
+    DependsOn:
+      - VPC
+      - IPv6CidrBlock
+    Properties:
+      CidrBlock: !Select [ 4, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
+      Ipv6CidrBlock:
+        Fn::Sub:
+          - "${VpcPart}${SubnetPart}"
+          - SubnetPart: '04::/64'
+            VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub:
+              - ${AWS::StackName}-public-egress-${AZ}
+              - AZ: !Select
+                - 1
+                - Fn::GetAZs: ""
+        - Key: kubernetes.io/role/elb
+          Value: 1
+  PublicSubnet4RtAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet4
+      RouteTableId:
+        Ref: PublicRt
+
+  PublicSubnet5:
+    Type: AWS::EC2::Subnet
+    DependsOn:
+      - VPC
+      - IPv6CidrBlock
+    Properties:
+      CidrBlock: !Select [ 5, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
+      Ipv6CidrBlock:
+        Fn::Sub:
+          - "${VpcPart}${SubnetPart}"
+          - SubnetPart: '05::/64'
+            VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub:
+              - ${AWS::StackName}-public-egress-${AZ}
+              - AZ: !Select
+                - 2
+                - Fn::GetAZs: ""
+        - Key: kubernetes.io/role/elb
+          Value: 1
+  PublicSubnet5RtAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet5
       RouteTableId:
         Ref: PublicRt
 
@@ -269,6 +374,40 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId:
         Ref: NAT0
+
+  NAT0a:
+    Type: AWS::EC2::NatGateway
+    Condition: CreatePrivateNetworks
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+        - EIP0a
+        - AllocationId
+      SubnetId:
+        Ref: PublicSubnet0
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub:
+              - ${AWS::StackName}-nat-a-${AZ}
+              - AZ: !Select
+                - 0
+                - Fn::GetAZs: ""
+  EIP0a:
+    Type: AWS::EC2::EIP
+    Condition: CreatePrivateNetworks
+    Properties:
+      Domain: vpc
+  NatRoute0a:
+    Type: AWS::EC2::Route
+    Condition: CreatePrivateNetworks
+    Properties:
+      RouteTableId:
+        Ref: PrivateRt0
+      DestinationCidrBlock: 10.0.144.0/20
+      NatGatewayId:
+        Ref: NAT0a
+
   PrivateRt0DefaultIpv6Route:
     Type: AWS::EC2::Route
     Condition: CreatePrivateNetworks
@@ -395,11 +534,11 @@ Resources:
       - VPC
       - IPv6CidrBlock
     Properties:
-      CidrBlock: !Select [ 30, !Cidr [ !GetAtt VPC.CidrBlock, 34, 8 ]]
+      CidrBlock: !Select [ 6, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
       Ipv6CidrBlock:
         Fn::Sub:
           - "${VpcPart}${SubnetPart}"
-          - SubnetPart: 'a1::/64'
+          - SubnetPart: 'a0::/64'
             VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
       VpcId:
         Ref: VPC
@@ -432,11 +571,11 @@ Resources:
       - VPC
       - IPv6CidrBlock
     Properties:
-      CidrBlock: !Select [ 31, !Cidr [ !GetAtt VPC.CidrBlock, 34, 8 ]]
+      CidrBlock: !Select [ 7, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
       Ipv6CidrBlock:
         Fn::Sub:
           - "${VpcPart}${SubnetPart}"
-          - SubnetPart: 'a2::/64'
+          - SubnetPart: 'a1::/64'
             VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
       VpcId:
         Ref: VPC
@@ -469,11 +608,11 @@ Resources:
       - VPC
       - IPv6CidrBlock
     Properties:
-      CidrBlock: !Select [ 32, !Cidr [ !GetAtt VPC.CidrBlock, 34, 8 ]]
+      CidrBlock: !Select [ 8, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
       Ipv6CidrBlock:
         Fn::Sub:
           - "${VpcPart}${SubnetPart}"
-          - SubnetPart: 'a3::/64'
+          - SubnetPart: 'a2::/64'
             VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
       VpcId:
         Ref: VPC
@@ -498,6 +637,118 @@ Resources:
         Ref: PrivateSubnet2
       RouteTableId:
         Ref: PrivateRt2
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Condition: CreatePrivateNetworks
+    DependsOn:
+      - VPC
+      - IPv6CidrBlock
+    Properties:
+      CidrBlock: !Select [ 9, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
+      Ipv6CidrBlock:
+        Fn::Sub:
+          - "${VpcPart}${SubnetPart}"
+          - SubnetPart: 'a3::/64'
+            VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub:
+              - ${AWS::StackName}-private-egress-${AZ}
+              - AZ: !Select
+                - 0
+                - Fn::GetAZs: ""
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1
+  PrivateSubnet3RtAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: CreatePrivateNetworks
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet3
+      RouteTableId:
+        Ref: PrivateRt0
+
+  PrivateSubnet4:
+    Type: AWS::EC2::Subnet
+    Condition: CreatePrivateNetworks
+    DependsOn:
+      - VPC
+      - IPv6CidrBlock
+    Properties:
+      CidrBlock: !Select [ 10, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
+      Ipv6CidrBlock:
+        Fn::Sub:
+          - "${VpcPart}${SubnetPart}"
+          - SubnetPart: 'a4::/64'
+            VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub:
+              - ${AWS::StackName}-private-egress-${AZ}
+              - AZ: !Select
+                - 1
+                - Fn::GetAZs: ""
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1
+  PrivateSubnet4RtAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: CreatePrivateNetworks
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet4
+      RouteTableId:
+        Ref: PrivateRt1
+
+  PrivateSubnet5:
+    Type: AWS::EC2::Subnet
+    Condition: CreatePrivateNetworks
+    DependsOn:
+      - VPC
+      - IPv6CidrBlock
+    Properties:
+      CidrBlock: !Select [ 11, !Cidr [ !GetAtt VPC.CidrBlock, 16, 12 ]]
+      Ipv6CidrBlock:
+        Fn::Sub:
+          - "${VpcPart}${SubnetPart}"
+          - SubnetPart: 'a5::/64'
+            VpcPart: !Select [ 0, !Split [ '00::/56', !Select [ 0, !GetAtt VPC.Ipv6CidrBlocks ]]]
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub:
+              - ${AWS::StackName}-private-egress-${AZ}
+              - AZ: !Select
+                - 2
+                - Fn::GetAZs: ""
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1
+  PrivateSubnet5RtAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: CreatePrivateNetworks
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet5
+      RouteTableId:
+        Ref: PrivateRt2
+
 
   #
   # Security groups

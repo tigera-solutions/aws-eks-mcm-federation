@@ -27,7 +27,7 @@ Parameters:
 
   KubernetesVersion:
     Description: The desired Kubernetes version for your cluster
-    Default: "1.16"
+    Default: "1.20"
     Type: String
 
   BootstrapArguments:
@@ -62,8 +62,8 @@ Resources:
       MinSize: 0
       MaxSize: 15
       VPCZoneIdentifier:
-        - Fn::ImportValue: !Sub "${EnvironmentName}:PublicSubnet0"
-        - Fn::ImportValue: !Sub "${EnvironmentName}:PublicSubnet1"
+#        - Fn::ImportValue: !Sub "${EnvironmentName}:PublicSubnet0"
+#        - Fn::ImportValue: !Sub "${EnvironmentName}:PublicSubnet1"
         - Fn::ImportValue: !Sub "${EnvironmentName}:PublicSubnet2"
       Tags:
       - Key: Name
